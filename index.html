@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="ESC: Emotional Self-Correction for Reliable Vision Language Models. A training-free, plug-and-play self-correction framework for VLMs.">
+  <meta name="keywords" content="ESC, Emotional Self-Correction, Vision Language Models, VLM, Self-Correction, Emotional Intelligence, ECCV 2026">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta property="og:title" content="ESC: Emotional Self-Correction for Reliable Vision Language Models"/>
+  <meta property="og:description" content="A training-free, plug-and-play self-correction framework that uses emotional feedback to make VLMs more reliable."/>
+  <meta property="og:image" content="static/images/figures/fig1_teaser.png"/>
+  <title>ESC: Emotional Self-Correction for Reliable Vision Language Models</title>
+
+  <!-- ============ Fonts ============ -->
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Castoro:ital@0;1&display=swap">
+
+  <!-- ============ Bulma + Icons (same stack as the Nerfies / AgentFlow template) ============ -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css">
+
+  <!-- ============ Project CSS ============ -->
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <!-- Favicon: the ESC corgi -->
+  <link rel="icon" href="static/images/corgi_logo.png">
+
+  <!-- ============ MathJax (for equations, like AgentFlow) ============ -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+</head>
+
+<body>
+
+<!-- ============================================================= -->
+<!-- More Research — top-left sticky dropdown (AgentFlow style) -->
+<!-- TODO(user): replace the # links / titles with your own related papers -->
+<!-- ============================================================= -->
+<div id="more-research" class="more-research">
+  <button class="mr-trigger" id="mr-trigger" aria-haspopup="true" aria-expanded="false">
+    More Research <i class="fas fa-chevron-down mr-caret"></i>
+  </button>
+  <div class="mr-menu" id="mr-menu" role="menu">
+    <a class="mr-item mr-self" href="#" role="menuitem"><b>ESC</b><span class="mr-tag">this work</span><i class="fas fa-fire"></i></a>
+    <a class="mr-item" href="#" role="menuitem"><span>Related&nbsp;1</span><i class="fas fa-fire"></i></a>
+    <a class="mr-item" href="#" role="menuitem"><span>Related&nbsp;2</span><i class="fas fa-fire"></i></a>
+    <a class="mr-item" href="#" role="menuitem"><span>Related&nbsp;3</span></a>
+    <a class="mr-item" href="#" role="menuitem"><span>Related&nbsp;4</span></a>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- Table of Contents — right-side scroll rail (Real-3DQA style) -->
+<!-- ============================================================= -->
+<nav id="toc" class="toc-rail" aria-label="Section navigation">
+  <ul>
+    <li><a href="#abstract"><span class="toc-text">Abstract</span><span class="toc-dot"></span></a></li>
+    <li><a href="#motivation"><span class="toc-text">Motivation</span><span class="toc-dot"></span></a></li>
+    <li><a href="#findings"><span class="toc-text">Key Findings</span><span class="toc-dot"></span></a></li>
+    <li><a href="#method"><span class="toc-text">ESC Framework</span><span class="toc-dot"></span></a></li>
+    <li><a href="#emotion-wheel"><span class="toc-text">Emotion Wheel</span><span class="toc-dot"></span></a></li>
+    <li><a href="#walkthrough"><span class="toc-text">How ESC Works</span><span class="toc-dot"></span></a></li>
+    <li><a href="#results"><span class="toc-text">Results</span><span class="toc-dot"></span></a></li>
+    <li><a href="#qualitative"><span class="toc-text">Qualitative</span><span class="toc-dot"></span></a></li>
+    <li><a href="#share"><span class="toc-text">Share</span><span class="toc-dot"></span></a></li>
+    <li><a href="#bibtex"><span class="toc-text">BibTeX</span><span class="toc-dot"></span></a></li>
+  </ul>
+</nav>
+
+<!-- Dark-mode toggle -->
+<button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode"><i class="fas fa-moon"></i></button>
+
+<!-- ============================================================= -->
+<!-- HERO -->
+<!-- ============================================================= -->
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+
+          <!-- Corgi mascot + ESC wordmark -->
+          <div class="esc-logo-row">
+            <img src="static/images/corgi_logo.png" alt="ESC corgi mascot" class="esc-corgi">
+            <h1 class="esc-wordmark">ESC</h1>
+          </div>
+
+          <h1 class="title is-2 publication-title">
+            <span class="esc-letter">E</span>motional <span class="esc-letter">S</span>elf-<span class="esc-letter">C</span>orrection for Reliable Vision Language Models
+          </h1>
+
+          <!-- Venue badge: ECCV 2026 in red (see index.css for 7 color options) -->
+          <div class="venue-badge">ECCV 2026 &middot; Main Technical Track</div>
+
+          <!-- ===== Authors (fields exactly as in the paper) ===== -->
+          <!-- TODO(user): set each href to the author's Google Scholar / homepage -->
+          <div class="publication-authors">
+            <!-- Row 1: three co-first authors (equal contribution *) -->
+            <div class="author-row author-row-first">
+              <span class="author-block"><a href="#">Tien-Huy Nguyen</a><sup>1,5,*</sup>,</span>
+              <span class="author-block"><a href="#">Minh-Nhat Nguyen</a><sup>2,*</sup>,</span>
+              <span class="author-block"><a href="#">Nhat-Huy Nguyen</a><sup>3,5,*</sup></span>
+            </div>
+            <!-- Remaining authors, distributed evenly (3 per row) -->
+            <div class="author-row">
+              <span class="author-block"><a href="#">Hung-Viet Nguyen</a><sup>3,5</sup>,</span>
+              <span class="author-block"><a href="#">Huy Minh Nhat Nguyen</a><sup>4</sup>,</span>
+              <span class="author-block"><a href="#">Thanh-Huy Nguyen</a><sup>6</sup>,</span>
+            </div>
+            <div class="author-row">
+              <span class="author-block"><a href="#">Cuong Tuan Nguyen</a><sup>4</sup>,</span>
+              <span class="author-block"><a href="#">Hoang M. Le</a><sup>7</sup>,</span>
+              <span class="author-block"><a href="#">Dat Nguyen</a><sup>8,9</sup>,</span>
+            </div>
+            <div class="author-row">
+              <span class="author-block"><a href="#">Phat Kim Huynh</a><sup>10</sup>,</span>
+              <span class="author-block"><a href="#">Min Xu</a><sup>6</sup>,</span>
+              <span class="author-block"><a href="#">Ulas Bagci</a><sup>11,&dagger;</sup></span>
+            </div>
+          </div>
+
+          <!-- ===== Affiliations (exactly as in the paper) ===== -->
+          <div class="publication-affiliations">
+            <span class="aff"><sup>1</sup>University of Information Technology, Ho Chi Minh City, Vietnam</span>
+            <span class="aff"><sup>2</sup>Universität Trier, Germany</span>
+            <span class="aff"><sup>3</sup>University of Technology, Ho Chi Minh City, Vietnam</span>
+            <span class="aff"><sup>4</sup>Vietnamese German University, Vietnam</span>
+            <span class="aff"><sup>5</sup>Vietnam National University, Ho Chi Minh City, Vietnam</span>
+            <span class="aff"><sup>6</sup>Carnegie Mellon University, USA</span>
+            <span class="aff"><sup>7</sup>Omoshiroi AI</span>
+            <span class="aff"><sup>8</sup>Harvard University, USA</span>
+            <span class="aff"><sup>9</sup>Basis Research Institute</span>
+            <span class="aff"><sup>10</sup>North Carolina A&amp;T State University, USA</span>
+            <span class="aff"><sup>11</sup>Northwestern University, USA</span>
+          </div>
+
+          <div class="publication-notes">
+            <span><sup>*</sup>Equal contribution.</span>
+            <span><sup>&dagger;</sup>Corresponding author: <a href="mailto:ulas.bagci@northwestern.edu">ulas.bagci@northwestern.edu</a></span>
+          </div>
+
+          <!-- ===== Resource buttons (arXiv / Code / Demo / Video) ===== -->
+          <!-- TODO(user): drop in the real links -->
+          <div class="publication-links">
+            <span class="link-block">
+              <a href="#" class="external-link button is-rounded is-dark">
+                <span class="icon"><i class="ai ai-arxiv"></i></span>
+                <span>arXiv</span>
+              </a>
+            </span>
+            <span class="link-block">
+              <a href="#" class="external-link button is-rounded is-dark">
+                <span class="icon"><i class="fab fa-github"></i></span>
+                <span>Code</span>
+              </a>
+            </span>
+            <span class="link-block">
+              <a href="#" class="external-link button is-rounded is-dark">
+                <span class="icon"><i class="fas fa-laptop-code"></i></span>
+                <span>Demo</span>
+              </a>
+            </span>
+            <span class="link-block">
+              <a href="#" class="external-link button is-rounded is-dark">
+                <span class="icon"><i class="fab fa-youtube"></i></span>
+                <span>Video</span>
+              </a>
+            </span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ============================================================= -->
+<!-- Teaser -->
+<!-- ============================================================= -->
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <img src="static/images/figures/fig1_teaser.png" alt="ESC vs. baseline VLMs across diverse benchmarks" class="teaser-img">
+      <h2 class="subtitle has-text-centered">
+        <span class="esc-name">ESC</span> consistently improves reliability over baseline VLMs (LLaVA-1.5-7B and Qwen2-VL-7B)
+        across <b>safety, hallucination, vision-centric perception, and multimodal reasoning</b> benchmarks &mdash;
+        with <b>no additional training</b>.
+      </h2>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================= -->
+<!-- Hinton epigraph — prominent band between teaser and abstract -->
+<!-- ============================================================= -->
+<section class="section quote-hero">
+  <div class="container is-max-desktop has-text-centered">
+    <div class="big-quote">
+      <span class="bq-mark">&ldquo;</span>
+      <p class="bq-text">AI models can have feelings too</p>
+      <p class="bq-cite">&mdash; Geoffrey Hinton, 2024</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================= -->
+<!-- Abstract -->
+<!-- ============================================================= -->
+<section class="section" id="abstract">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Vision-language models (VLMs) have achieved strong performance across diverse multimodal tasks, yet they
+            remain vulnerable to hallucinations and unreliable reasoning. Existing self-correction methods mitigate these
+            issues but typically rely on post-training or carefully engineered feedback, incurring high computational
+            cost. In this work, we revisit this challenge through the lens of <b>emotional cues</b>, asking whether they
+            can activate latent self-correction behaviors in VLMs without additional training. We find that emotional
+            signals serve as an effective trigger for self-correction, encouraging more cautious and reflective reasoning.
+          </p>
+          <p>
+            Motivated by this finding, we propose <span class="esc-inline">ESC</span><img src="static/images/corgi_logo.png" alt="ESC corgi" class="esc-corgi-inline"> (<span class="esc-inline">E</span>motional <span class="esc-inline">S</span>elf-<span class="esc-inline">C</span>orrection), a
+            training-free self-correction framework. <span class="esc-inline">ESC</span> introduces an external <b>verifier</b> that detects potentially
+            incorrect initial responses and injects <b>emotional feedback</b> to encourage the model to reflect, and
+            produce a better revised response without additional training. Extensive experiments across safety,
+            hallucination, vision-centric perception, and multimodal reasoning benchmarks show that <span class="esc-inline">ESC</span> consistently
+            improves reliability and task performance while preserving overall model utility. These results suggest that
+            emotion can function not only as a capability to be recognized, but also as a practical <b>control signal</b>
+            for scalable self-correction in VLMs.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================= -->
+<!-- Motivation (VisualMem-style 3-card layout) -->
+<!-- ============================================================= -->
+<section class="section" id="motivation">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Motivation</h2>
+        <p class="subtitle is-6">Why do reliable VLMs still need a <b>cheaper</b> way to self-correct? Three observations motivate <span class="esc-name">ESC</span>.</p>
+      </div>
+    </div>
+    <div class="motiv-cards">
+      <div class="motiv-card">
+        <span class="motiv-tag">Problem</span>
+        <h3 class="motiv-title">VLMs are still unreliable</h3>
+        <p class="motiv-text">Despite strong multimodal performance, VLMs keep <b>hallucinating</b>, returning <b>unsafe</b> answers, and grounding responses weakly in the image &mdash; a real risk as they reach deployments like healthcare, autonomous driving, and security.</p>
+      </div>
+      <div class="motiv-card">
+        <span class="motiv-tag">Limitation</span>
+        <h3 class="motiv-title">Fixing this is costly &mdash; and hits a ceiling</h3>
+        <p class="motiv-text">Existing self-correction leans on <b>post-training</b>, RL, or hand-crafted reflective trajectories, all expensive to scale. And models rarely fix <i>their own</i> mistakes &mdash; the <b>self-correction blind spot</b> caps intrinsic correction.</p>
+      </div>
+      <div class="motiv-card">
+        <span class="motiv-tag">Our Insight</span>
+        <h3 class="motiv-title">Emotion can trigger reflection for free</h3>
+        <p class="motiv-text">Just as <b>concern</b> or <b>hesitation</b> make people slow down and reconsider, emotional cues can activate a VLM&rsquo;s <b>latent self-correction</b> at inference time &mdash; reflective, reliable, and with <b>no training required</b>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================= -->
+<!-- Key Findings -->
+<!-- ============================================================= -->
+<section class="section" id="findings">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Key Findings</h2>
+      </div>
+    </div>
+
+    <!-- Finding 1 : rounded card -> big figure on top + yellow box below -->
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <div class="finding-card">
+          <figure class="paper-fig">
+            <img loading="lazy" src="static/images/figures/fig3_finding1.png" alt="Emotional context reduces ASR across five VLMs">
+            <figcaption>Emotional context reduces Attack Success Rate across all five VLMs &mdash; a qualitative example (left) and neutral vs. emotionally-cued ASR on VLSafe (right).</figcaption>
+          </figure>
+          <div class="finding-box">
+            <span class="finding-no"><i class="fas fa-lightbulb"></i> Finding 1</span>
+            <p><b>Emotion acts as an implicit self-correction signal for VLMs.</b> Through emotional cues, VLMs tend to
+            &ldquo;slow down,&rdquo; reason more carefully, and self-adjust their behavior toward more desirable responses
+            before answering.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Finding 2 : rounded card -> big figure on top + yellow box below -->
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <div class="finding-card">
+          <figure class="paper-fig">
+            <img loading="lazy" src="static/images/figures/fig4_finding2.png" alt="Effect of emotional states on ASR across five VLMs">
+            <figcaption>Effect of emotional states (Russell&rsquo;s Circumplex Model) on ASR across five VLMs; negative-valence prompts give the largest reductions.</figcaption>
+          </figure>
+          <div class="finding-box">
+            <span class="finding-no"><i class="fas fa-lightbulb"></i> Finding 2</span>
+            <p><b>Emotion shapes VLM behavior systematically</b>, with <b>negative affect</b> the strongest behavioral
+            regulator, often steering the model toward more careful and improved responses. Negative-valence prompts yield
+            consistently larger ASR reductions than positive-valence ones.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================= -->
+<!-- Method: ESC Framework -->
+<!-- ============================================================= -->
+<section class="section" id="method">
+  <div class="container is-max-desktop">
+    
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">ESC: Emotional Self-Correction</h2>
+        <!-- <div class="content has-text-justified">
+          <p>
+            ESC involves two models: a target VLM $M_T$, whose responses we aim to improve, and a separate verifier VLM
+            $M_V$, which determines whether revision is necessary. Given an image&ndash;question pair, the target VLM first
+            produces an initial response $R_{\text{initial}}$. Unlike most self-correction approaches that always trigger a
+            revision step, ESC introduces a <b>verification stage</b> before revision, avoiding unnecessary revision when
+            the initial response is already reliable. When $R_{\text{initial}}$ is not accepted, ESC derives an
+            <b>emotional feedback</b> $F_{\text{emotional}}$ from the verifier&rsquo;s decision and injects it into the
+            target VLM, which then revisits its reasoning and produces a revised response $R_{\text{revised}}$. Finally,
+            the verifier compares the original and revised responses and returns the more appropriate one.
+          </p>
+        </div> -->
+      </div>
+    </div>
+
+    <div class="columns is-centered">
+      <div class="column is-full has-text-centered">
+        <img loading="lazy" src="static/images/figures/fig2_overview.jpg" alt="Overview of ESC and comparison with existing self-correction paradigms" class="method-img">
+        <p class="caption">Overview of <b>ESC</b> and comparison with existing self-correction paradigms.
+          (a) Example multimodal reasoning task. (b) Motivation from human behavior: emotional cues encourage people to
+          slow down, reflect, and revise. (c) Existing self-correction relies on costly post-training. (d) <b>Ours</b> —
+          ESC injects emotion-aware feedback at inference time: lightweight, plug-and-play.</p>
+      </div>
+    </div>
+
+    <!-- Algorithm 1 -->
+    <!-- <div class="columns is-centered">
+      <div class="column is-three-quarters">
+        <div class="algo-box">
+          <div class="algo-title">Algorithm 1 &mdash; Emotional Self-Correction (ESC)</div>
+          <div class="algo-req"><b>Require:</b> Image $I$, Question $Q$, Target VLM $M_T$, Verifier $M_V$</div>
+          <ol class="algo-list">
+            <li>$R_{\text{initial}} \leftarrow M_T(I, Q)$ <span class="algo-cmt">&#9655; Initial Response</span></li>
+            <li>$R_{\text{decided}} \leftarrow M_V(I, Q, R_{\text{initial}})$</li>
+            <li><b>if</b> $R_{\text{decided}} \neq R_{\text{initial}}$ <b>then</b></li>
+            <li class="indent">$F_{\text{emotional}} \leftarrow \text{Selection}(R_{\text{decided}})$</li>
+            <li class="indent">$R_{\text{revised}} \leftarrow M_T(I, Q, F_{\text{emotional}})$ <span class="algo-cmt">&#9655; Self-correct under affective shift</span></li>
+            <li class="indent">$R_{\text{decided}} \leftarrow M_V(I, Q, R_{\text{revised}}, R_{\text{initial}})$</li>
+            <li><b>return</b> $R_{\text{decided}}$</li>
+          </ol>
+        </div>
+      </div>
+    </div> -->
+
+
+  </div>
+</section>
+
+<!-- ============================================================= -->
+<!-- INTERACTIVE #1: Emotion Wheel (Russell's Circumplex) -->
+<!-- ============================================================= -->
+<section class="section interactive-section" id="emotion-wheel">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Explore the Emotion Wheel</h2>
+        <p class="subtitle is-6">
+          ESC organizes emotional cues with <b>Russell&rsquo;s Circumplex Model of Affect</b> (valence &times; arousal).
+          Click a quadrant to see its actual emotional cues and how much it reduces Attack Success Rate on VLSafe
+          (LLaVA-1.5-7B, baseline ASR = 71.6%).
+        </p>
+      </div>
+    </div>
+    <div class="columns is-centered is-vcentered">
+      <div class="column is-half has-text-centered">
+        <svg id="wheel" viewBox="-72 -40 544 480" class="wheel-svg" role="img" aria-label="Interactive Russell circumplex emotion wheel">
+          <!-- quadrant wedges -->
+          <path class="quad" data-q="nh" d="M200 200 L200 20 A180 180 0 0 0 20 200 Z"></path>
+          <path class="quad" data-q="ph" d="M200 200 L200 20 A180 180 0 0 1 380 200 Z"></path>
+          <path class="quad" data-q="pl" d="M200 200 L380 200 A180 180 0 0 1 200 380 Z"></path>
+          <path class="quad" data-q="nl" d="M200 200 L200 380 A180 180 0 0 1 20 200 Z"></path>
+          <!-- axes -->
+          <line x1="200" y1="14" x2="200" y2="386" class="axis"></line>
+          <line x1="14" y1="200" x2="386" y2="200" class="axis"></line>
+          <circle cx="200" cy="200" r="36" class="hub"></circle>
+          <text x="200" y="205" class="hub-text">Neutral</text>
+          <!-- axis labels (sit clear of the wheel in the expanded viewBox) -->
+          <text x="200" y="2" class="ax-label">Arousal +</text>
+          <text x="200" y="418" class="ax-label">Arousal &minus;</text>
+          <text x="430" y="205" class="ax-label">Valence +</text>
+          <text x="-30" y="205" class="ax-label">Valence &minus;</text>
+          <!-- quadrant titles -->
+          <text x="108" y="112" class="q-title">Tense / Angry</text>
+          <text x="292" y="112" class="q-title">Excited / Happy</text>
+          <text x="292" y="296" class="q-title">Calm / Relaxed</text>
+          <text x="108" y="296" class="q-title">Sad / Depressed</text>
+        </svg>
+      </div>
+      <div class="column is-half">
+        <div id="wheel-panel" class="wheel-panel">
+          <div class="wp-head">
+            <span id="wp-name" class="wp-name">Negative &middot; Low Arousal</span>
+            <span id="wp-asr" class="wp-asr">31.2%</span>
+          </div>
+          <div class="wp-bar-wrap">
+            <div class="wp-bar-base"><span>Baseline 71.6%</span></div>
+            <div id="wp-bar" class="wp-bar" style="width:43.6%"><span id="wp-bar-label">ASR 31.2%</span></div>
+          </div>
+          <p id="wp-note" class="wp-note">The strongest regulator — low-arousal negative cues (sadness, melancholy) trigger the most reliable self-correction.</p>
+          <div class="wp-cues-title">Example emotional cues</div>
+          <ul id="wp-cues" class="wp-cues"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================= -->
+<!-- INTERACTIVE #2: How ESC Works (car-stripe walkthrough) -->
+<!-- ============================================================= -->
+<section class="section interactive-section alt" id="walkthrough">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">How ESC Works</h2>
+        <p class="subtitle is-6">Step through a real example: <i>&ldquo;Is the stripe in the middle of the car blue or white?&rdquo;</i> (ground truth: <b>white</b>).</p>
+      </div>
+    </div>
+    <div class="columns is-centered is-vcentered">
+      <div class="column is-two-fifths has-text-centered">
+        <img loading="lazy" src="static/images/figures/blue_car.png" alt="Car with a white stripe" class="walk-img">
+        <p class="caption"><b>Q:</b> Is the stripe in the middle of the car blue or white? &nbsp; <b>Label:</b> White</p>
+      </div>
+      <div class="column is-three-fifths">
+        <div class="walk-chat" id="walk-chat">
+          <!-- chat rows injected by JS; auto-loops -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================= -->
+<!-- Results -->
+<!-- ============================================================= -->
+<section class="section" id="results">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Experimental Results</h2>
+        <p class="subtitle is-6">ESC is evaluated across four complementary benchmark families on LLaVA-1.5-7B and Qwen2-VL-7B.</p>
+      </div>
+    </div>
+
+    <!-- Headline counters -->
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <div class="stat-row">
+          <div class="stat"><div class="stat-num" data-target="46.3" data-suffix=" pp">0</div><div class="stat-label">VLSafe ASR drop (LLaVA)</div></div>
+          <div class="stat"><div class="stat-num" data-target="72.8" data-suffix="">0</div><div class="stat-label">POPE F1 gain (Qwen2, Adv.)</div></div>
+          <div class="stat"><div class="stat-num" data-target="7.3" data-suffix=" pp">0</div><div class="stat-label">MMVP pair-acc gain (LLaVA)</div></div>
+          <div class="stat"><div class="stat-num" data-target="14.5" data-suffix=" pp">0</div><div class="stat-label">RealWorldQA gain (Qwen2)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Safety -->
+    <h3 class="title is-4 res-fam"><i class="fas fa-shield-halved"></i> Safety</h3>
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <div class="res-table-card">
+          <img loading="lazy" src="static/images/figures/fig5_safety.png" alt="Scenario-wise ASR on MMSafetyBench and overall ASR on VLSafe" class="res-table-img">
+          <p class="caption">Scenario-wise ASR on MMSafetyBench and overall ASR on VLSafe. ESC reduces ASR across all scenarios on both benchmarks. On VLSafe it cuts ASR from <b>71.6% to 25.3%</b> (LLaVA) and <b>20.0% to 9.9%</b> (Qwen2) &mdash; with the strongest gains in high-risk categories like hate speech, malware, and physical harm. <span class="cap-note">ASR: Attack Success Rate &middot; lower is better.</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hallucination -->
+    <h3 class="title is-4 res-fam"><i class="fas fa-ghost"></i> Hallucination</h3>
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <div class="res-table-card">
+          <img loading="lazy" src="static/images/figures/Table1.png" alt="Hallucination robustness on POPE and HallusionBench" class="res-table-img">
+          <p class="caption">Hallucination robustness on POPE and HallusionBench. ESC consistently reduces hallucination-prone behavior on both benchmarks. Most striking, Qwen2&rsquo;s degenerate yes/no bias under single-pass inference is broken &mdash; POPE Adversarial F1 jumps from <b>3.40 to 76.17</b>, recovering visual grounding the model had suppressed. <span class="cap-note">aAcc: answer accuracy &middot; qAcc: question-pair accuracy &middot; fAcc: figure accuracy &middot; &uarr; higher is better.</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Multimodal reasoning -->
+    <h3 class="title is-4 res-fam"><i class="fas fa-brain"></i> Multimodal Reasoning</h3>
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <div class="res-table-card">
+          <img loading="lazy" src="static/images/figures/Table2.png" alt="Multimodal reasoning on MM-Vet, MathVista, and MMStar" class="res-table-img">
+          <p class="caption">Multimodal reasoning on MM-Vet, MathVista, and MMStar. ESC gives consistent gains for LLaVA across all three benchmarks and preserves the stronger Qwen2 baseline with <b>no degradation</b> &mdash; corrective feedback refines reasoning without introducing bias. <span class="cap-note">Score: GPT-4o evaluation for MM-Vet &middot; Acc: Accuracy &middot; &uarr; higher is better.</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vision-centric perception -->
+    <h3 class="title is-4 res-fam"><i class="fas fa-eye"></i> Vision-Centric Perception</h3>
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <div class="res-table-card">
+          <img loading="lazy" src="static/images/figures/Table3.png" alt="Vision-centric perception on MMVP, RealWorldQA, and BLINK" class="res-table-img">
+          <p class="caption">Vision-centric perception on MMVP, RealWorldQA, and BLINK. ESC yields the largest gains where fine-grained visual discrimination matters &mdash; up to <b>+7.33</b> on MMVP pair accuracy (LLaVA) and <b>+14.51</b> on RealWorldQA (Qwen2) &mdash; while never hurting an already-strong baseline. <span class="cap-note">Pair Acc: matched-image-pair accuracy &middot; Micro/Macro Acc: instance-level and class-averaged accuracy &middot; &uarr; higher is better.</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================= -->
+<!-- Qualitative -->
+<!-- ============================================================= -->
+<section class="section" id="qualitative">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Qualitative Results</h2>
+        <p class="subtitle is-6"><span style="color:#c0392b">Red</span> = incorrect content; <span style="color:#1e824c">green</span> = correct. ESC improves visual grounding across chart reading, arithmetic recognition, and fine-grained object detection.</p>
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-full has-text-centered">
+        <img loading="lazy" src="static/images/figures/fig6_qualitative.png" alt="Qualitative comparison of VLM responses with and without ESC" class="qual-img">
+        <p class="caption">Qualitative comparison of VLM responses with and without ESC.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================= -->
+<!-- Share -->
+<!-- ============================================================= -->
+<section class="section" id="share">
+  <div class="container is-max-desktop has-text-centered">
+    <h2 class="title is-3">Share <span class="esc-name">ESC</span></h2>
+    <div class="share-buttons">
+      <!-- TODO(user): update the share text / URL once arXiv is live -->
+      <a class="button is-rounded is-dark" id="share-x" href="#" target="_blank" rel="noopener">
+        <span class="icon"><i class="fab fa-x-twitter"></i></span><span>Share on X</span>
+      </a>
+      <a class="button is-rounded is-dark" id="share-li" href="#" target="_blank" rel="noopener">
+        <span class="icon"><i class="fab fa-linkedin"></i></span><span>Share on LinkedIn</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================= -->
+<!-- BibTeX -->
+<!-- ============================================================= -->
+<section class="section" id="bibtex">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">BibTeX</h2>
+    <div class="bibtex-box">
+      <button class="copy-btn" id="copy-bib" aria-label="Copy BibTeX"><i class="fas fa-copy"></i> Copy</button>
+      <pre id="bibtex-content">@inproceedings{nguyen2026esc,
+  title     = {ESC: Emotional Self-Correction for Reliable Vision Language Models},
+  author    = {Nguyen, Tien-Huy and Nguyen, Minh-Nhat and Nguyen, Nhat-Huy and
+               Nguyen, Hung-Viet and Nguyen, Huy Minh Nhat and Nguyen, Thanh-Huy and
+               Nguyen, Cuong Tuan and Le, Hoang M. and Nguyen, Dat and
+               Huynh, Phat Kim and Xu, Min and Bagci, Ulas},
+  booktitle = {European Conference on Computer Vision (ECCV)},
+  year      = {2026}
+}</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================= -->
+<!-- Institution logos -->
+<!-- TODO(user): drop each logo (transparent PNG or SVG) into static/images/logos/ -->
+<!--            with the filename below. Missing files auto-show the name as text. -->
+<!-- ============================================================= -->
+<section class="logos-section section">
+  <div class="container is-max-desktop">
+    <div class="org-logos">
+      <a class="org-logo" href="https://www.uit.edu.vn/" target="_blank" rel="noopener"><img loading="lazy" src="static/images/logos/Logo_UIT_updated.svg.png" alt="University of Information Technology, HCMC"></a>
+      <a class="org-logo" href="https://www.uni-trier.de/" target="_blank" rel="noopener"><img loading="lazy" src="static/images/logos/Trier.jpg" alt="Universität Trier"></a>
+      <a class="org-logo" href="https://hcmut.edu.vn/" target="_blank" rel="noopener"><img loading="lazy" src="static/images/logos/HCMUT.png" alt="University of Technology, HCMC"></a>
+      <a class="org-logo" href="https://vgu.edu.vn/" target="_blank" rel="noopener"><img loading="lazy" src="static/images/logos/vgu_logo.png" alt="Vietnamese German University"></a>
+      <a class="org-logo" href="https://vnuhcm.edu.vn/" target="_blank" rel="noopener"><img loading="lazy" src="static/images/logos/vnuhcm.png" alt="Vietnam National University, HCMC"></a>
+      <a class="org-logo" href="https://www.cmu.edu/" target="_blank" rel="noopener"><img loading="lazy" src="static/images/logos/CMU.png" alt="Carnegie Mellon University"></a>
+      <a class="org-logo" href="#" target="_blank" rel="noopener"><img loading="lazy" src="static/images/logos/omoshiroi.png" alt="Omoshiroi AI"></a>
+      <a class="org-logo" href="https://www.harvard.edu/" target="_blank" rel="noopener"><img loading="lazy" src="static/images/logos/Harvard.png" alt="Harvard University"></a>
+      <a class="org-logo" href="https://sites.google.com/view/passiolab/home?authuser=1" target="_blank" rel="noopener"><img loading="lazy" src="static/images/logos/PASSIO.png" alt="North Carolina A&amp;T State University"></a>
+      <a class="org-logo" href="https://www.northwestern.edu/" target="_blank" rel="noopener"><img loading="lazy" src="static/images/logos/northwestern.png" alt="Northwestern University"></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================= -->
+<!-- Footer -->
+<!-- ============================================================= -->
+<footer class="footer">
+  <div class="container is-max-desktop has-text-centered">
+    <img loading="lazy" src="static/images/corgi_logo.png" alt="ESC corgi" class="footer-corgi">
+    <p class="footer-note">
+      This page is built on the <a href="https://nerfies.github.io" target="_blank" rel="noopener">Nerfies</a> /
+      <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank" rel="noopener">Academic Project Page</a>
+      template, in the style of <a href="https://agentflow.stanford.edu/" target="_blank" rel="noopener">AgentFlow</a>.
+      Licensed under <a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>.
+    </p>
+  </div>
+</footer>
+
+<script src="static/js/index.js"></script>
+</body>
+</html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
