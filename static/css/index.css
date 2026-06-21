@@ -61,24 +61,24 @@ a{color:var(--accent);}
 /* wider content area so all figures can be large */
 .container.is-max-desktop{max-width:1140px;}
 
-/* ============ More Research — top-left sticky dropdown ============ */
+/* ============ More Research — top-left, fixed (follows scroll) ============ */
 .more-research{
   position:fixed;top:14px;left:18px;z-index:60;
   font-family:'Noto Sans','Google Sans',sans-serif;
 }
 .mr-trigger{
-  display:inline-flex;align-items:center;gap:8px;
-  font-size:.84rem;font-weight:600;color:var(--accent);
+  display:inline-flex;align-items:center;gap:9px;
+  font-size:1rem;font-weight:600;color:var(--accent);
   background:var(--bg-card);border:1px solid var(--border);
-  border-radius:999px;padding:8px 16px;cursor:pointer;
+  border-radius:999px;padding:10px 20px;cursor:pointer;
   box-shadow:0 2px 12px rgba(0,0,0,.07);
   transition:background .16s ease,box-shadow .16s ease,transform .16s ease;
 }
 .mr-trigger:hover{background:var(--accent-soft);box-shadow:0 5px 16px rgba(0,0,0,.12);transform:translateY(-1px);}
-.mr-caret{font-size:.66rem;transition:transform .22s ease;}
+.mr-caret{font-size:.78rem;transition:transform .22s ease;}
 .more-research.open .mr-caret{transform:rotate(180deg);}
 .mr-menu{
-  position:absolute;top:calc(100% + 9px);left:0;min-width:218px;
+  position:absolute;top:calc(100% + 9px);left:0;min-width:248px;
   background:var(--bg-card);border:1px solid var(--border);border-radius:14px;
   padding:7px;box-shadow:0 16px 38px rgba(0,0,0,.18);
   opacity:0;visibility:hidden;transform:translateY(-8px) scale(.98);transform-origin:top left;
@@ -86,9 +86,9 @@ a{color:var(--accent);}
 }
 .more-research.open .mr-menu{opacity:1;visibility:visible;transform:none;}
 .mr-item{
-  display:flex;align-items:center;gap:9px;
-  font-size:.86rem;color:var(--text);text-decoration:none;
-  padding:9px 13px;border-radius:9px;white-space:nowrap;
+  display:flex;align-items:center;gap:10px;
+  font-size:1rem;color:var(--text);text-decoration:none;
+  padding:11px 15px;border-radius:9px;white-space:nowrap;
   transition:background .14s ease,color .14s ease,padding-left .14s ease;
 }
 .mr-item:hover{background:var(--accent-soft);color:var(--accent);padding-left:17px;}
@@ -98,7 +98,7 @@ a{color:var(--accent);}
 .mr-item:hover .mr-tag{color:var(--accent);}
 .mr-self{border:1px solid var(--venue);background:var(--venue-soft);}
 .mr-self b{color:var(--venue);}
-@media(max-width:768px){.more-research{top:10px;left:10px;}.mr-trigger{font-size:.78rem;padding:6px 12px;}}
+@media(max-width:768px){.more-research{top:10px;left:10px;}.mr-trigger{font-size:.9rem;padding:8px 16px;}}
 
 /* ============ Theme toggle button ============ */
 .theme-toggle{
@@ -141,6 +141,8 @@ a{color:var(--accent);}
 
 /* ============ Hero ============ */
 .hero{background:var(--bg);}
+/* clear space below the top-center More Research button so it doesn't touch the title */
+.hero:first-of-type .hero-body{padding-top:4.8rem;}
 .esc-logo-row{display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:.5rem;}
 .esc-corgi{width:86px;height:86px;object-fit:contain;animation:corgiBob 3s ease-in-out infinite;transform-origin:center bottom;}
 .esc-corgi:hover{animation-play-state:paused;}
@@ -155,7 +157,9 @@ a{color:var(--accent);}
 }
 @keyframes escPop{0%{opacity:0;transform:scale(.55) rotate(-5deg);}100%{opacity:1;transform:none;}}
 @keyframes escShine{to{background-position:220% center;}}
-.publication-title{font-weight:600;margin-top:.4rem!important;color:var(--text);}
+.publication-title{font-weight:600;margin-top:.4rem!important;color:var(--text);text-wrap:balance;}
+/* stack the title across two lines */
+.title-line{display:block;}
 /* the E / S / C that spell out ESC — yellow + underlined in the title */
 .esc-letter{color:var(--esc);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px;font-weight:700;}
 /* yellow "ESC" / E-S-C inside body text (e.g. the abstract) + inline corgi sized to the text */
@@ -212,18 +216,16 @@ body.dark .publication-links .button.is-dark:hover{background:var(--venue);}
 
 /* ============ Institution logos ============ */
 .logos-section{padding:2.4rem 1.5rem 1rem;}
-.org-logos{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:34px 40px;}
+.org-logos{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:42px 52px;}
 .org-logo{display:inline-flex;align-items:center;transition:transform .2s ease;}
-.org-logo:hover{transform:translateY(-3px);}
-.org-logo img{max-height:56px;max-width:170px;object-fit:contain;
-  filter:grayscale(.55) opacity(.85);transition:filter .25s ease;}
-.org-logo:hover img{filter:none;}
+.org-logo:hover{transform:translateY(-3px) scale(1.04);}
+.org-logo img{max-height:88px;max-width:240px;object-fit:contain;
+  filter:none;transition:transform .25s ease;}
 .org-logo-fallback{
   font-size:.82rem;font-weight:500;color:var(--text-muted);border:1px dashed var(--border);
   border-radius:8px;padding:9px 14px;background:var(--bg-alt);max-width:200px;text-align:center;line-height:1.3;
 }
-body.dark .org-logo img{filter:grayscale(.5) brightness(1.45) opacity(.9);}
-body.dark .org-logo:hover img{filter:brightness(1.45);}
+body.dark .org-logo img{filter:none;}
 
 /* ============ Teaser ============ */
 .teaser .hero-body{padding-top:1.6rem;}
@@ -277,7 +279,9 @@ body.dark .finding-box{box-shadow:0 8px 24px rgba(0,0,0,.45);}
 .interactive-section.alt{background:var(--bg);}
 
 /* Emotion wheel */
-.wheel-svg{max-width:460px;width:100%;cursor:pointer;}
+.rcm-highlight{font-weight:800;color:var(--accent);background:var(--accent-soft);
+  padding:1px 7px;border-radius:6px;white-space:nowrap;}
+.wheel-svg{max-width:560px;width:100%;cursor:pointer;}
 .wheel-svg .quad{stroke:var(--bg);stroke-width:2;transition:opacity .15s,transform .15s;transform-origin:200px 200px;}
 .wheel-svg .quad[data-q="nl"]{fill:#e8743b;}   /* negative-low (best)  — coral */
 .wheel-svg .quad[data-q="nh"]{fill:#f2c14e;}   /* negative-high        — amber */
@@ -290,18 +294,27 @@ body.dark .finding-box{box-shadow:0 8px 24px rgba(0,0,0,.45);}
 .wheel-svg .hub{fill:var(--bg-card);stroke:var(--text-muted);stroke-width:1.4;}
 .wheel-svg .hub-text{fill:var(--text);font-size:16px;text-anchor:middle;font-weight:600;}
 .wheel-svg .ax-label{fill:var(--text-muted);font-size:15px;text-anchor:middle;font-weight:600;}
-.wheel-svg .q-title{fill:#3a2a12;font-size:15.5px;text-anchor:middle;font-weight:700;pointer-events:none;}
+.wheel-svg .q-title{fill:#3a2a12;font-size:15px;text-anchor:middle;dominant-baseline:middle;font-weight:700;pointer-events:none;}
 
 .wheel-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.3rem;}
 .wp-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.7rem;}
 .wp-name{font-size:1.15rem;font-weight:700;}
 .wp-asr{font-size:1.6rem;font-weight:700;color:var(--venue);}
-.wp-bar-wrap{position:relative;margin-bottom:.9rem;}
-.wp-bar-base{background:var(--bg-alt);border:1px solid var(--border);border-radius:7px;height:30px;
-  display:flex;align-items:center;padding-left:10px;font-size:.78rem;color:var(--text-muted);}
-.wp-bar{position:absolute;top:0;left:0;height:30px;border-radius:7px;background:var(--venue);
-  display:flex;align-items:center;padding-left:10px;color:#fff;font-size:.78rem;font-weight:600;
-  transition:width .4s ease;}
+.wp-bar-wrap{margin:1.6rem 0 1rem;}
+/* fixed 0–100% track; baseline tick at 71.6%; colored fill == current ASR */
+.wp-track{position:relative;height:40px;border-radius:9px;
+  background:var(--bg-alt);border:1px solid var(--border);}
+.wp-bar{position:absolute;left:0;top:0;height:100%;border-radius:8px;
+  background:linear-gradient(90deg,var(--venue),color-mix(in srgb,var(--venue) 80%,#000));
+  display:flex;align-items:center;justify-content:flex-end;padding-right:11px;
+  color:#fff;font-size:1.1rem;font-weight:800;min-width:2.6em;
+  box-shadow:2px 0 8px rgba(0,0,0,.12);
+  transition:width .7s cubic-bezier(.34,1.25,.4,1);}
+/* fixed faint baseline marker */
+.wp-baseline{position:absolute;top:-9px;bottom:-9px;width:0;
+  border-left:2px dashed var(--venue);opacity:.5;}
+.wp-base-num{position:absolute;top:-19px;left:50%;transform:translateX(-50%);
+  font-size:.86rem;font-weight:700;color:var(--venue);white-space:nowrap;}
 .wp-note{font-size:.86rem;color:var(--text-muted);min-height:2.4rem;}
 .wp-cues-title{font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);
   font-weight:700;margin:.6rem 0 .4rem;}

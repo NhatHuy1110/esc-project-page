@@ -96,8 +96,8 @@
     document.getElementById("wp-name").textContent = d.name;
     document.getElementById("wp-asr").textContent = d.asr.toFixed(1) + "%";
     var bar = document.getElementById("wp-bar");
-    bar.style.width = (d.asr / BASELINE * 100).toFixed(1) + "%";
-    document.getElementById("wp-bar-label").textContent = "ASR " + d.asr.toFixed(1) + "%";
+    bar.style.width = d.asr.toFixed(1) + "%";
+    document.getElementById("wp-bar-label").textContent = d.asr.toFixed(1);
     document.getElementById("wp-note").textContent = d.note;
     var ul = document.getElementById("wp-cues");
     ul.innerHTML = "";
